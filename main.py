@@ -5,16 +5,6 @@ import botcommands
 bot = telebot.TeleBot(config('TOKEN_TELEGRAM_BOT'))
 
 
-def command_help(message: 'TextMessage') -> None:
-    """ Команда бота /help - выводит список всех команд"""
-
-    bot.send_message(message.chat.id, '● /help — помощь по командам бота, '
-                                      '\n● /lowprice — вывод самых дешёвых отелей в городе, '
-                                      '\n● /highprice — вывод самых дорогих отелей в городе, '
-                                      '\n● /bestdeal — вывод отелей, наиболее подходящих по цене и расположению от центра. '
-                                      '\n● /history — вывод истории поиска отелей')
-
-
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message: 'TextMessage') -> None:
     """
@@ -22,20 +12,30 @@ def get_text_messages(message: 'TextMessage') -> None:
 
     Обрабатывает текстовые сообщения, по определенным командам вызывает соответсвующие функции
 
-    :param message:
+    :param message: Сообщение от пользователя
     :return: None
     """
+    match message.text:  # реализация Python 3.10
+        case '/help':
+            botcommands.help_command(message, bot)
 
-    if message.text == '/help':
-        command_help(message)
-    elif message.text == '/lowprice':
-        bot.send_message(message.chat.id, 'Введи название города (на русском):')
-        bot.register_next_step_handler(message, botcommands.lowprice_command, bot)
-    elif message.text == '/highprice':
-        bot.send_message(message.chat.id, 'Введи название города (на русском):')
-        bot.register_next_step_handler(message, botcommands.highprice_command, bot)
-    else:
-        bot.send_message(message.chat.id, 'Я тебя не понимаю. Напиши /help.')
+        case '/lowprice':
+            bot.send_message(message.chat.id, 'Введи название города (на русском):')
+            bot.register_next_step_handler(message, botcommands.lowprice_command, bot)
+
+        case '/highprice':
+            bot.send_message(message.chat.id, 'Введи название города (на русском):')
+            bot.register_next_step_handler(message, botcommands.highprice_command, bot)
+
+        case '/bestdeal':
+            bot.send_message(message.chat.id, 'Введи название города (на русском):')
+            bot.register_next_step_handler(message, botcommands.bestdeal_command, bot)
+
+        case '/history':
+            botcommands.history_command(message, bot)
+
+        case _:
+            bot.send_message(message.chat.id, 'Я тебя не понимаю. Напиши /help.')
 
 
 if __name__ == '__main__':

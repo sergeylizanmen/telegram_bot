@@ -5,7 +5,7 @@ def lowprice_command(message: 'TextMessage', bot: 'Telebot') -> None:
     """
     Команда бота /lowprice - выводит список отелей в выбранном городе (начиная с дешевых)
 
-    Находит через ф-цию find_city_id ID города и отправляет данные на следующий шаг обработки,
+    Находит город через ф-цию find_city_id ID города и отправляет данные на следующий шаг обработки,
     если города нет выводит соответствующее сообщение
 
     :param bot: Бот
@@ -16,10 +16,12 @@ def lowprice_command(message: 'TextMessage', bot: 'Telebot') -> None:
     bot.send_message(message.chat.id, 'Идет поиск...')
 
     city_id = find_city_id(message.text)
-    if city_id:
+    if city_id:  # если город найден - checking_the_amount_of_hotels
         bot.send_message(message.chat.id,
                          'Введите количество отелей, которые необходимо вывести в результате (не больше 25):')
         bot.register_next_step_handler(message, checking_the_amount_of_hotels,
-                                       bot=bot, city_id=city_id, sort_type='PRICE')
-    else:
+                                       bot=bot, city_id=city_id, sort_type='PRICE',
+                                       price_range=None, distance_range=None,
+                                       command='/lowprice')
+    else:  # если город не найден - выход из команды
         bot.send_message(message.chat.id, f'{message.text} не найден в списке городов')
